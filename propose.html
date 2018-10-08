@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+    <script src="./node_modules/crypto-js/hmac-sha256.js"></script>
+</head>
+<body>
+    <h2>Propose a Project</h2>
+
+    <label for="pname">Project Name</label>
+    <input type="text" name="pname" id="pname">
+
+    <label for="budget">Budget</label>
+    <input type="text" name="budget" id="budget">
+
+    <label for="hash">File Hash</label>
+    <input type="text" name="file" id="file">
+
+    <button id="button">Propose</button>
+    <br>
+
+    <label for="proj_id">Project ID</label>
+    <input type="text" name="proj_id" id="proj_id">
+    <button id="button2">Get Project Details</button>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+        web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+        
+
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+        console.log(web3.eth.accounts[0]);
+
+        let TransContract = web3.eth.contract([
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_bidder",
+				"type": "address"
+			},
+			{
+				"name": "_projName",
+				"type": "string"
+			},
+			{
+				"name": "_hash",
+				"type": "string"
+			}
+		],
+		"name": "bid",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_contractor",
+				"type": "address"
+			},
+			{
+				"name": "_finalProp",
+				"type": "string"
+			},
+			{
+				"name": "_projName",
+				"type": "string"
+			}
+		],
+		"name": "biddingWon",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_pname",
+				"type": "string"
+			},
+			{
+				"name": "_budget",
+				"type": "uint256"
+			},
+			{
+				"name": "_hash",
+				"type": "string"
+			}
+		],
+		"name": "proposeProject",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getProject",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "id",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "projects",
+		"outputs": [
+			{
+				"name": "project_name",
+				"type": "string"
+			},
+			{
+				"name": "timestamp",
+				"type": "uint256"
+			},
+			{
+				"name": "budget",
+				"type": "uint256"
+			},
+			{
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"name": "hash",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "propProj",
+		"outputs": [
+			{
+				"name": "project_name",
+				"type": "string"
+			},
+			{
+				"name": "timestamp",
+				"type": "uint256"
+			},
+			{
+				"name": "budget",
+				"type": "uint256"
+			},
+			{
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"name": "hash",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+    ]);
+
+    let Trans = TransContract.at('0x521de11997419411dc1c09779b826d78fb07869e');
+    console.log(Trans);
+
+    $('#button').click(function(){
+        Trans.proposeProject($('#pname').val(), $('#budget').val(), $('#file').val(), {
+            from : web3.eth.accounts[0],
+            gas : 3000000
+        }, function(err, res){
+            if(!err)
+                alert("Success");
+            else
+                console.log(err);
+        });
+    });
+
+    $('#button2').click(function(){
+        console.log(Trans.projects($('#proj_id').val()));
+    });
+
+    </script>
+</body>
+</html>
